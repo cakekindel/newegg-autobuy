@@ -1,7 +1,7 @@
-import {timer} from 'rxjs';
-import * as RxOp from 'rxjs/operators/index.js';
-import axios from 'axios';
-import cheerio from 'cheerio';
+const {timer} = require('rxjs');
+const RxOp = require('rxjs/operators/index.js');
+const axios = require('axios');
+const cheerio = require('cheerio');
 
 const purchaseObj = (title, price, url, inStock) => ({title, price, url, inStock});
 
@@ -30,14 +30,15 @@ const getInStock = () => axios.get(url, {responseType: 'text'})
                                            .get()
                               )
                               .then(arr => arr.filter(item => item.inStock))
-                              .then(arr => {
-                                console.log(arr);
-                                return arr;
-                              });
 
 timer(0, 500)
   .pipe(
     RxOp.flatMap(getInStock),
+    RxOp.tap(data => {
+      if (data.length > 0) {
+        data.forEach(sendNotification)
+      }
+    }),
     RxOp.takeWhile(isEmpty),
   )
-  .subscribe();
+  .subscribe({ next: () => console.log("got an event"), complete: () => console.log("ALL DONE!") });
