@@ -16,15 +16,6 @@ const not = f => (...args) => !f(...args);
  */
 const purchaseObj = (title, price, url, inStock) => ({title, price, url, inStock});
 
-const sendNotification = item => {
-  const pb = new PushBullet(envOrThrow('PB_API_KEY'));
-  const notify = device => pb.link(device.iden, 'Newegg Alert', item.url, item.title);
-
-  pb.devices()
-    .then(({devices}) => devices.filter(d => d.icon === 'phone' && d.active))
-    .then(devices     => devices.forEach(notify))
-}
-
 // newegg stuff
 const isAd = $ => (_, el) => $('.txt-ads-box', el).length > 0 ? true : false;
 const parseItem = $ => (_, el) => purchaseObj(
@@ -46,6 +37,15 @@ const getNeweggItems = axios.get(url, {responseType: 'text'})
 // aggregate sources, filter out of stock
 const getInStock = () => getNeweggItems()
                            .then(arr => arr.filter(item => item.inStock));
+
+const sendNotification = item => {
+  const pb = new PushBullet(envOrThrow('PB_API_KEY'));
+  const notify = device => pb.link(device.iden, 'Newegg Alert', item.url, item.title);
+
+  pb.devices()
+    .then(({devices}) => devices.filter(d => d.icon === 'phone' && d.active))
+    .then(devices     => devices.forEach(notify))
+}
 
 timer(0, 500)
   .pipe(
