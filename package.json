@@ -1,0 +1,24 @@
+{
+  "name": "newegg-autobuy",
+  "version": "1.0.0",
+  "description": "JS command-line utility to check newegg for in-stock parts and buy before item is scalped",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cakekindel/newegg-autobuy.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cakekindel/newegg-autobuy/issues"
+  },
+  "homepage": "https://github.com/cakekindel/newegg-autobuy#readme",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "cheerio": "^1.0.0-rc.5",
+    "sanctuary": "^3.1.0"
+  }
+}
