@@ -38,19 +38,28 @@ const getNeweggItems = axios.get(url, {responseType: 'text'})
 const getInStock = () => getNeweggItems()
                            .then(arr => arr.filter(item => item.inStock));
 
+const printItemInfo = item => {
+  return `Price: $${item.price}\nItem Name: ${item.title}`;
+}
+
+const notifiedItems = []
+
 const sendNotification = item => {
+  if(notifiedItems.some(oldItem => oldItem.url === item.url))
+    return;
+  notifiedItems.push(item);
   const pb = new PushBullet(envOrThrow('PB_API_KEY'));
-  const notify = device => pb.link(device.iden, 'Newegg Alert', item.url, item.title);
+  const notify = device => pb.link(device.iden, 'Newegg Alert', item.url, printItemInfo(item));
 
   pb.devices()
-    .then(({devices}) => devices.filter(d => d.icon === 'phone' && d.active))
+    .then(({devices}) => devices)
     .then(devices     => devices.forEach(notify))
 }
 
 timer(0, 500)
   .pipe(
     // RxOp.flatMap(getInStock),
-    RxOp.map(() => [{title: 'Testing 123', url: 'https://www.cheese.com'}]),
+    RxOp.map(() => [{title: 'Testing 123', url: 'https://www.cheese.com', price: 419.68}]),
     RxOp.tap(data => {
       if (data.length > 0) {
         data.forEach(sendNotification)
